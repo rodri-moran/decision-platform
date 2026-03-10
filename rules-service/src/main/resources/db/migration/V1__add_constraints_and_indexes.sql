@@ -1,0 +1,3 @@
+-- CREATE UNIQUE INDEX uk_rule_versions_one_active_per_rule
+--     ON rule_versions(rule_key)
+--     WHERE status = 'ACTIVE';

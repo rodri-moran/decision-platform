@@ -1,0 +1,7 @@
+-- ALTER TABLE rule_versions
+-- ALTER COLUMN definition_json TYPE jsonb
+-- USING definition_json::jsonb;
+--
+-- ALTER TABLE rule_versions
+-- ALTER COLUMN metadata_json TYPE jsonb
+-- USING metadata_json::jsonb;
