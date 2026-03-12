@@ -21,13 +21,13 @@ public abstract class RuleDraftMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "traceId", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "definitionJson", expression = "java(toJson(request.definitionJson()))")
-    @Mapping(target = "metadataJson", expression = "java(toJson(request.metadataJson()))")
+    @Mapping(target = "definitionJson", source = "definitionJson")
+    @Mapping(target = "metadataJson", source = "metadataJson")
     public abstract RuleDraft toEntity(CreateRuleDraftRequestDTO request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "definitionJson", expression = "java(toJson(request.definitionJson()))")
-    @Mapping(target = "metadataJson", expression = "java(toJson(request.metadataJson()))")
+    @Mapping(target = "definitionJson", source = "definitionJson")
+    @Mapping(target = "metadataJson", source = "metadataJson")
     public abstract void updateDraftFromDto(UpdateRuleDraftRequestDTO request, @MappingTarget RuleDraft ruleDraft);
 
     @Mapping(target = "definitionJson", expression = "java(toParsedRuleDefinition(ruleDraft.getDefinitionJson()))")
@@ -35,33 +35,52 @@ public abstract class RuleDraftMapper {
     public abstract RuleDraftResponseDTO toResponseDTO(RuleDraft ruleDraft);
 
 
+    protected String map(ParsedRuleDefinition definition) {
+        if (definition == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(definition);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error serializing definitionJson", e);
+        }
+    }
+
+    protected String map(Map<String, Object> metadata) {
+        if (metadata == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(metadata);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error serializing metadataJson", e);
+        }
+    }
+
     protected ParsedRuleDefinition toParsedRuleDefinition(String definitionJson) {
         if (definitionJson == null || definitionJson.isBlank()) {
             return null;
         }
-        return objectMapper.readValue(definitionJson, ParsedRuleDefinition.class);
+        try {
+            return objectMapper.readValue(definitionJson, ParsedRuleDefinition.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error deserializing definitionJson", e);
+        }
     }
 
     protected Map<String, Object> toMetadataMap(String metadataJson) {
         if (metadataJson == null || metadataJson.isBlank()) {
             return null;
         }
-        return objectMapper.readValue(
-                metadataJson,
-                new tools.jackson.core.type.TypeReference<Map<String, Object>>() {}
-        );
-    }
-    protected String toJson(ParsedRuleDefinition definition) {
-        if (definition == null) {
-            return null;
+        try {
+            return objectMapper.readValue(
+                    metadataJson,
+                    new tools.jackson.core.type.TypeReference<Map<String, Object>>() {}
+            );
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error deserializing metadataJson", e);
         }
-        return objectMapper.writeValueAsString(definition);
     }
 
-    protected String toJson(Map<String, Object> metadata) {
-        if (metadata == null) {
-            return null;
-        }
-        return objectMapper.writeValueAsString(metadata);
-    }
+
 }

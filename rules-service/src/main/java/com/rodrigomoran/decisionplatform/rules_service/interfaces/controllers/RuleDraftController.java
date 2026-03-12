@@ -29,4 +29,12 @@ public class RuleDraftController {
             @RequestHeader("X-Trace-Id") String traceId) {
         return ResponseEntity.ok(ruleDraftCommandService.updateDraft(draftId, request ,actor ,traceId));
     }
+    @PatchMapping("/{draftId}/archive")
+    public ResponseEntity<Void> archiveDraft(
+            @PathVariable Long draftId,
+            @RequestHeader("X-Actor") String actor,
+            @RequestHeader("X-Trace-Id") String traceId){
+        ruleDraftCommandService.archiveDraft(draftId,actor,traceId);
+        return ResponseEntity.noContent().build();
+    }
 }

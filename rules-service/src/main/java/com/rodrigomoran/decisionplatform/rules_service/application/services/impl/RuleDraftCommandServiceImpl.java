@@ -15,6 +15,7 @@ import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.UpdateRul
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Objects;
 @Service
 @RequiredArgsConstructor
@@ -110,6 +111,24 @@ public class RuleDraftCommandServiceImpl implements RuleDraftCommandService {
 
     @Override
     public void archiveDraft(Long draftId, String actor, String traceId) {
+        if (actor == null || actor.isBlank()) {
+            throw new IllegalArgumentException("Actor must not be null or blank");
+        }
 
+        if (traceId == null || traceId.isBlank()) {
+            throw new IllegalArgumentException("TraceId must not be null or blank");
+        }
+
+        RuleDraft ruleDraft = ruleDraftRepository.findById(draftId)
+                .orElseThrow(() -> new RuleDraftNotFoundException(draftId));
+
+        if(ruleDraft.getStatus() == RuleDraftStatus.ARCHIVED){
+            return;
+        }
+
+        ruleDraft.setStatus(RuleDraftStatus.ARCHIVED);
+        ruleDraft.setUpdatedBy(actor);
+        ruleDraft.setTraceId(traceId);
+        ruleDraftRepository.save(ruleDraft);
     }
 }
