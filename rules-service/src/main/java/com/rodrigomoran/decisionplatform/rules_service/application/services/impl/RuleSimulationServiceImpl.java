@@ -42,6 +42,7 @@ public class RuleSimulationServiceImpl implements RuleSimulationService {
     @Override
     public RuleSimulationResultDTO simulateActiveRule(String ruleKey, Map<String, Object> sampleContext, String traceId) {
         // TODO: Validar ruleKey
+
         // TODO: Validar sampleContext
         // TODO: Buscar versión ACTIVE por ruleKey
         // TODO: Si no existe, lanzar ActiveVersionNotFoundException

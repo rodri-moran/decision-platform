@@ -34,7 +34,6 @@ public abstract class RuleDraftMapper {
     @Mapping(target = "metadataJson", expression = "java(toMetadataMap(ruleDraft.getMetadataJson()))")
     public abstract RuleDraftResponseDTO toResponseDTO(RuleDraft ruleDraft);
 
-
     protected String map(ParsedRuleDefinition definition) {
         if (definition == null) {
             return null;
