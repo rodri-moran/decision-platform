@@ -42,7 +42,7 @@ public class RuleDraftQueryServiceImpl implements RuleDraftQueryService {
 
         if(status != null){
             result = ruleDraftRepository.findByStatus(status, pageable);
-        }else{
+        } else{
             result = ruleDraftRepository.findAll(pageable);
         }
         List<RuleDraftResponseDTO> content =

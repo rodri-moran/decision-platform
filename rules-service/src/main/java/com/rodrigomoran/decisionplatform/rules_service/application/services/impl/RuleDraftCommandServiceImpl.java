@@ -4,7 +4,7 @@ import com.rodrigomoran.decisionplatform.rules_service.application.mappers.RuleD
 import com.rodrigomoran.decisionplatform.rules_service.application.services.interfaces.RuleDraftCommandService;
 import com.rodrigomoran.decisionplatform.rules_service.application.validators.RuleDefinitionValidator;
 import com.rodrigomoran.decisionplatform.rules_service.domain.enums.RuleDraftStatus;
-import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleDraftNotEditableException;
+import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleDraftNotPublishableException;
 import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleDraftNotFoundException;
 import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleKeyAlreadyExistsException;
 import com.rodrigomoran.decisionplatform.rules_service.infraestructure.entities.RuleDraft;
@@ -15,7 +15,6 @@ import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.UpdateRul
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Objects;
 @Service
 @RequiredArgsConstructor
@@ -84,7 +83,7 @@ public class RuleDraftCommandServiceImpl implements RuleDraftCommandService {
                 .orElseThrow(() -> new RuleDraftNotFoundException(draftId));
 
         if (!ruleDraft.getStatus().equals(RuleDraftStatus.DRAFT)) {
-            throw new RuleDraftNotEditableException();
+            throw new RuleDraftNotPublishableException();
         }
 
         if (request.name() != null && request.name().isBlank()) {

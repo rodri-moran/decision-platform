@@ -12,7 +12,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/simulation/**","/simulation"
-                        , "/draft/**"
+                        , "/draft/**","/version/**","/h2-console/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

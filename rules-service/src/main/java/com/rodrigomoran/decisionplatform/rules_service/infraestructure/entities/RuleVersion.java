@@ -35,14 +35,11 @@ public class RuleVersion {
     private String description;
     @Column(name = "rule_key")
     private String ruleKey;
-    private Long version;
+    private Integer versionNumber;
     @Column(name = "supersedesVersion")
     private Integer supersedesVersion;
-//    @Column(name = "definition_json", nullable = false, columnDefinition = "jsonb")
     @Column(name = "definition_json", nullable = false)
-
     private String definitionJson; // copia inmutable al publicar
-//    @Column(name = "metadata_json", columnDefinition = "jsonb")
     @Column(name = "metadata_json")
     private String metadataJson;
     @Enumerated(EnumType.STRING)
@@ -51,6 +48,10 @@ public class RuleVersion {
     private String publishedBy;
     @Column(name = "published_at")
     private Instant publishedAt;
+    @Column(name = "reactivated_by")
+    private String reactivatedBy;
+    @Column(name = "reactivated_at")
+    private Instant reactivatedAt;
     @Enumerated(EnumType.STRING)
     @Column(name = "change_type")
     private ChangeType changeType;

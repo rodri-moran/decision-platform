@@ -1,15 +1,12 @@
 package com.rodrigomoran.decisionplatform.rules_service.application.services.impl;
-
 import com.rodrigomoran.decisionplatform.rules_service.application.services.interfaces.RuleSimulationService;
 import com.rodrigomoran.decisionplatform.rules_service.application.simulation.engine.RuleSimulationEngine;
-import com.rodrigomoran.decisionplatform.rules_service.application.simulation.model.ParsedRuleDefinition;
 import com.rodrigomoran.decisionplatform.rules_service.application.simulation.model.RuleDefinitionParser;
 import com.rodrigomoran.decisionplatform.rules_service.application.validators.RuleDefinitionValidator;
 import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.RuleSimulationRequestDTO;
 import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.RuleSimulationResultDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

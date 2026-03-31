@@ -6,8 +6,9 @@ import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.RuleDraft
 import com.rodrigomoran.decisionplatform.rules_service.interfaces.dtos.UpdateRuleDraftRequestDTO;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import tools.jackson.databind.ObjectMapper;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 @Mapper(componentModel = "spring")
 public abstract class RuleDraftMapper {
 
@@ -56,7 +57,7 @@ public abstract class RuleDraftMapper {
         }
     }
 
-    protected ParsedRuleDefinition toParsedRuleDefinition(String definitionJson) {
+    public ParsedRuleDefinition toParsedRuleDefinition(String definitionJson) {
         if (definitionJson == null || definitionJson.isBlank()) {
             return null;
         }
@@ -74,12 +75,10 @@ public abstract class RuleDraftMapper {
         try {
             return objectMapper.readValue(
                     metadataJson,
-                    new tools.jackson.core.type.TypeReference<Map<String, Object>>() {}
+                    new TypeReference<Map<String, Object>>() {}
             );
         } catch (Exception e) {
             throw new IllegalArgumentException("Error deserializing metadataJson", e);
         }
     }
-
-
 }

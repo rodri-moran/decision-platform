@@ -1,14 +1,11 @@
 package com.rodrigomoran.decisionplatform.rules_service.infraestructure.entities;
-
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 import java.util.UUID;
-
 @Entity
 @Table(
         name = "outbox_events",
@@ -34,10 +31,7 @@ public class OutboxEvent {
     private String aggregateId;
     @Column(name = "event_type")
     private String eventType;
-    @Lob
-//    @Column(name = "payload_json", columnDefinition = "jsonb")
-    @Column(name = "payload_json", nullable = false)
-
+    @Column(name = "payload_json", nullable = false, columnDefinition = "TEXT")
     private String payloadJson;
     @Enumerated(EnumType.STRING)
     private Status status;
