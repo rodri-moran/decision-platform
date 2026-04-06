@@ -43,6 +43,7 @@ public class OutboxCommandServiceImpl implements OutboxCommandService {
         event.setCreatedAt(Instant.now());
         event.setOcurredAt(publishedAt);
         event.setNextAttemptAt(Instant.now());
+        event.setTraceId(traceId);
 //        int aux = 2;
 //        if(aux > 1){
 //            throw new RuntimeException("Forced outbox failure for test");

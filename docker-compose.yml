@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rules-service
+
+  rules-service:
+    container_name: rules-service
+    depends_on:
+      - rule-db
+    build:
+      context: ./rules-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://rule-db:5432/ruleservicedb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+
+  rule-db:
+    image: postgres:16
+    container_name: rules-postgres
+    environment:
+      POSTGRES_DB: ruleservicedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

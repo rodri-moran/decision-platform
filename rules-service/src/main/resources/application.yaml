@@ -1,13 +1,15 @@
 spring:
+  kafka:
+    bootstrap-servers: kafka:9092
   flyway:
     baseline-on-migrate: true
   application:
     name: rules-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ruleservicedb
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -17,7 +19,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+server:
+  port: 8081
 #  datasource:
 #    url: jdbc:h2:mem:ruleservicedb
 #    driver-class-name: org.h2.Driver
@@ -38,5 +41,3 @@ spring:
 #      path: /h2-console
 #      settings:
 #        web-allow-others: false
-server:
-  port: 8080

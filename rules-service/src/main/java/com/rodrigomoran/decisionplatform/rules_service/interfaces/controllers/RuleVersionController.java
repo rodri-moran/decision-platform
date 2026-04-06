@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rules")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class RuleVersionController {
    private final RulePublishService rulePublishService;

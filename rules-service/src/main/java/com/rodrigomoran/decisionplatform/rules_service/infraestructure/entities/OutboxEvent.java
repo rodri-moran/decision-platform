@@ -48,6 +48,8 @@ public class OutboxEvent {
     private String lastError;
     @Column(name = "next_attempt_at")
     private Instant nextAttemptAt;
+    @Column(name = "trace_id")
+    private String traceId;
 
     public enum Status{
         PENDING, SENT, FAILED

@@ -17,4 +17,6 @@ public interface RuleDraftRepository extends JpaRepository<RuleDraft, Long> {
     Optional<RuleDraft>findByRuleKey(String ruleKey);
 
     Page<RuleDraft> findByStatus(RuleDraftStatus status, Pageable pageable);
+
+    boolean existsByRuleKeyAndStatus(String ruleKey, RuleDraftStatus status);
 }

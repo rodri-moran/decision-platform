@@ -4,6 +4,7 @@ import com.rodrigomoran.decisionplatform.rules_service.application.mappers.RuleD
 import com.rodrigomoran.decisionplatform.rules_service.application.services.interfaces.RuleDraftCommandService;
 import com.rodrigomoran.decisionplatform.rules_service.application.validators.RuleDefinitionValidator;
 import com.rodrigomoran.decisionplatform.rules_service.domain.enums.RuleDraftStatus;
+import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.ActiveDraftAlreadyExistsException;
 import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleDraftNotPublishableException;
 import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleDraftNotFoundException;
 import com.rodrigomoran.decisionplatform.rules_service.domain.exceptions.RuleKeyAlreadyExistsException;
@@ -40,8 +41,11 @@ public class RuleDraftCommandServiceImpl implements RuleDraftCommandService {
             throw new IllegalArgumentException("TraceId must not be null or blank");
         }
 
-        if (ruleDraftRepository.existsByRuleKey(request.ruleKey())) {
-            throw new RuleKeyAlreadyExistsException(request.ruleKey());
+//        if (ruleDraftRepository.existsByRuleKey(request.ruleKey())) {
+//            throw new RuleKeyAlreadyExistsException(request.ruleKey());
+//        }
+        if(ruleDraftRepository.existsByRuleKeyAndStatus(request.ruleKey(), RuleDraftStatus.DRAFT)){
+            throw new ActiveDraftAlreadyExistsException(request.ruleKey());
         }
 
         validator.validateOrThrow(request.definitionJson());

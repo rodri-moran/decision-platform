@@ -12,9 +12,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @Table(
         name = "rule_drafts",
-        uniqueConstraints = {
-                @UniqueConstraint(name="uk_rule_drafts_rule_key", columnNames = {"rule_key"})
-        },
         indexes = {
                 @Index(name="idx_rule_drafts_rule_key", columnList="rule_key"),
                 @Index(name="idx_rule_drafts_status", columnList="rule_draft_status"),
