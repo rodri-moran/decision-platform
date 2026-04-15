@@ -11,7 +11,7 @@ public class OutboxPublisherJob {
     private final OutboxPublisherService outboxPublisherService;
 
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 10000)
     public void publishPendingEventsJob(){
         //corre cada x tiempo
         //llama al service publisher

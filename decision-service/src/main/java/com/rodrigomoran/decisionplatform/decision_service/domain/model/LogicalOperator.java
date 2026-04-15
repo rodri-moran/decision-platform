@@ -1,4 +1,5 @@
 package com.rodrigomoran.decisionplatform.decision_service.domain.model;
 
-public class LogicalOperator {
+public enum LogicalOperator {
+    AND, OR
 }

@@ -23,7 +23,7 @@ public class RuleDraft {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, name = "rule_key")
-    private String ruleKey; // ej: fraud-payment, promo-elegibility
+    private String ruleKey;
     @Column(nullable = false)
     private String name; // Nombre humano. Ej.: "Antifraude - Pago con tarjeta"
     private String description;// Desc humana, ej: Rechazar pagos si el dispositivo es riesgoso y el usuario es nuevo.

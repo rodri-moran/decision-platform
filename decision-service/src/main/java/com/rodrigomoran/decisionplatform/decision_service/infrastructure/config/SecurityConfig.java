@@ -1,8 +1,10 @@
-package com.rodrigomoran.decisionplatform.rules_service.infraestructure.config;
+package com.rodrigomoran.decisionplatform.decision_service.infrastructure.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
 public class SecurityConfig {
 
@@ -11,9 +13,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/simulation/**","/simulation"
-                        , "/draft/**","/rules/**","/h2-console/**",
-                                "/**"
+                        .requestMatchers("/decisions/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

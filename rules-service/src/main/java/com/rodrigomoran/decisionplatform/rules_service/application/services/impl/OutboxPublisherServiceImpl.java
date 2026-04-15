@@ -22,9 +22,15 @@ public class OutboxPublisherServiceImpl implements OutboxPublisherService {
 
     @Override
     public void publishPendingEvents() {
-        List<OutboxEvent> events = outboxEventRepository.findTop50ByStatusAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(OutboxEvent.Status.PENDING, Instant.now());
+        List<OutboxEvent> events =
+                outboxEventRepository.findTop50ByStatusAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
+                        OutboxEvent.Status.PENDING,
+                        Instant.now()
+                );
 
-        for (OutboxEvent event : events){
+        log.info("Found {} pending outbox events ready to publish", events.size());
+
+        for (OutboxEvent event : events) {
             publishSingleEvent(event);
         }
     }

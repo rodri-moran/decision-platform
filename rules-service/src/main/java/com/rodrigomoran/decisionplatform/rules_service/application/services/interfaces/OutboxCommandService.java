@@ -1,5 +1,6 @@
 package com.rodrigomoran.decisionplatform.rules_service.application.services.interfaces;
 
+import com.rodrigomoran.decisionplatform.rules_service.infraestructure.entities.RuleVersion;
 import jakarta.transaction.Transactional;
 
 import java.time.Instant;
@@ -7,7 +8,7 @@ import java.time.Instant;
 public interface OutboxCommandService {
 
     @Transactional
-    void enqueueRulePublishedEvent(String ruleKey, Integer versionNumber, String actor, Instant publishedAt, String traceId);
+    void enqueueRulePublishedEvent(RuleVersion ruleVersion, String traceId);
 
     @Transactional
     void markAsSent(Long outboxId, Instant sentAt);

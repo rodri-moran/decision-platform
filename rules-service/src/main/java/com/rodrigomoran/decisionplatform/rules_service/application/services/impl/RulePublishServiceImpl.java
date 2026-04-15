@@ -113,7 +113,7 @@ public class RulePublishServiceImpl implements RulePublishService {
             ruleDraftRepository.save(draft);
 
             // TODO: crear y persistir OutboxEvent
-            outboxCommandService.enqueueRulePublishedEvent(ruleVersion.getRuleKey(), ruleVersion.getVersionNumber(), actor, publishedAt, traceId);
+            outboxCommandService.enqueueRulePublishedEvent(ruleVersion, traceId);
 
             RuleVersionResponseDTO response = ruleVersionMapper.toResponseDto(ruleVersion);
 

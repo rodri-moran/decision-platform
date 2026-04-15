@@ -12,5 +12,12 @@ spring:
                 - Path=/rules/**
               filters:
                 - StripPrefix=1
+
+            - id: decision-service
+              uri: http://decision-service:8082
+              predicates:
+                - Path=/decisions/**
+              filters:
+                - StripPrefix=0
 server:
   port: 8080
