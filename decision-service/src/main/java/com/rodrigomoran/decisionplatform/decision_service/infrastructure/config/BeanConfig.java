@@ -9,6 +9,7 @@ import com.rodrigomoran.decisionplatform.decision_service.domain.port.in.HandleR
 import com.rodrigomoran.decisionplatform.decision_service.domain.port.out.ActiveRuleRepositoryPort;
 import com.rodrigomoran.decisionplatform.decision_service.domain.port.out.RuleDefinitionParserPort;
 import com.rodrigomoran.decisionplatform.decision_service.domain.service.RuleEvaluationEngine;
+import com.rodrigomoran.decisionplatform.decision_service.infrastructure.messaging.publisher.DecisionMadeKafkaPublisher;
 import com.rodrigomoran.decisionplatform.decision_service.infrastructure.parser.JacksonRuleDefinitionParserAdapter;
 import com.rodrigomoran.decisionplatform.decision_service.infrastructure.persistence.adapter.ActiveRuleRepositoryAdapter;
 import com.rodrigomoran.decisionplatform.decision_service.infrastructure.persistence.repository.SpringDataActiveRuleRepository;
@@ -38,12 +39,16 @@ public class BeanConfig {
     public EvaluateDecisionUseCase evaluateDecisionUseCase(
             ActiveRuleRepositoryPort activeRuleRepositoryPort,
             RuleDefinitionParserPort ruleDefinitionParserPort,
-            RuleEvaluationEngine ruleEvaluationEngine
+            RuleEvaluationEngine ruleEvaluationEngine,
+            DecisionMadeKafkaPublisher decisionMadeKafkaPublisher,
+            ObjectMapper objectMapper
     ) {
         return new EvaluateDecisionService(
                 activeRuleRepositoryPort,
                 ruleDefinitionParserPort,
-                ruleEvaluationEngine
+                ruleEvaluationEngine,
+                decisionMadeKafkaPublisher,
+                objectMapper
         );
     }
 

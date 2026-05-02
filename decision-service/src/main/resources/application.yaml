@@ -31,6 +31,10 @@ spring:
         spring.json.trusted.packages: "com.rodrigomoran.decisionplatform.decision_service.infrastructure.messaging.dto"
         spring.json.value.default.type: com.rodrigomoran.decisionplatform.decision_service.infrastructure.messaging.dto.RulePublishedEventPayload
 
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
     listener:
       ack-mode: record
 
@@ -49,7 +53,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      enabled: true
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces

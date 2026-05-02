@@ -19,8 +19,27 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      enabled: true
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+
 server:
   port: 8081
+
 #  datasource:
 #    url: jdbc:h2:mem:ruleservicedb
 #    driver-class-name: org.h2.Driver

@@ -1,3 +1,48 @@
 spring:
   application:
     name: audit-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: audit-service-group
+      auto-offset-reset: earliest
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      enabled: true
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+app:
+  kafka:
+    topics:
+      decision-made: decisions.decision-made
+      rule-published: rules.rule-published
+
+server:
+  port: 8083

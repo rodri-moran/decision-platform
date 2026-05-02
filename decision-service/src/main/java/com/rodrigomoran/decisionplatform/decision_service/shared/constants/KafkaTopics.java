@@ -6,4 +6,5 @@ public final class KafkaTopics {
     }
 
     public static final String RULE_PUBLISHED = "rules.rule-published";
+    public static final String DECISION_MADE = "decisions.decision-made";
 }

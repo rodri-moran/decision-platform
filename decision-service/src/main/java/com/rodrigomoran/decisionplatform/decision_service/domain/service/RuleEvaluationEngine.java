@@ -82,6 +82,9 @@ public class RuleEvaluationEngine {
         if (matched) {
             reasons.add("Condition matched: field=%s, operator=%s, expected=%s, actual=%s"
                     .formatted(condition.getField(), condition.getOperator(), expectedValue, actualValue));
+        } else {
+            reasons.add("Condition did not match: field=%s, operator=%s, expected=%s, actual=%s"
+                    .formatted(condition.getField(), condition.getOperator(), expectedValue, actualValue));
         }
 
         return matched;

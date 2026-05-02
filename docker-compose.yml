@@ -64,6 +64,31 @@ services:
     volumes:
       - decision_postgres_data:/var/lib/postgresql/data
 
+  audit-service:
+    container_name: audit-service
+    depends_on:
+      - audit-db
+    build:
+      context: ./audit-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://audit-db:5432/auditdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  audit-db:
+    image: postgres:16
+    container_name: audit-postgres
+    environment:
+      POSTGRES_DB: auditdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - audit_postgres_data:/var/lib/postgresql/data
 
   kafka:
     image: apache/kafka:latest
@@ -82,8 +107,26 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - gateway
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
 
 
 volumes:
   rule_postgres_data:
   decision_postgres_data:
+  audit_postgres_data:

@@ -19,5 +19,12 @@ spring:
                 - Path=/decisions/**
               filters:
                 - StripPrefix=0
+
+            - id: audit-service
+              uri: http://audit-service:8083
+              predicates:
+                - Path=/audit/**
+              filters:
+                - StripPrefix=1
 server:
   port: 8080
