@@ -22,8 +22,8 @@ public class AuditDetailResponse {
     private String decision;
     private String matchedRule;
     private List<String> reasons;
-    private String inputRedactedJson;
+    private Object inputRedacted;
     private Long latencyMs;
-    private String payloadJson;
+    private Object payload;
     private Instant createdAt;
 }
