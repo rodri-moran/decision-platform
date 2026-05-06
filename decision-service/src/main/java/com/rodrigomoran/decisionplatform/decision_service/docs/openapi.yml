@@ -1,0 +1,143 @@
+openapi: 3.0.3
+
+info:
+  title: Decision Service API
+  description: >
+    API for evaluating active business rules against dynamic input data
+    and returning explainable decision results.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8082
+    description: Local decision-service
+  - url: http://localhost:8080/decision
+    description: API Gateway route for decision-service
+
+tags:
+  - name: Decisions
+    description: Operations for evaluating business decisions using active rules.
+
+paths:
+  /decisions/evaluate:
+    post:
+      tags:
+        - Decisions
+      summary: Evaluate a decision
+      description: Evaluates the active version of a rule using the provided rule key and input data.
+      operationId: evaluateDecision
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateDecisionRequest'
+            example:
+              ruleKey: fraud-risk-check
+              data:
+                customer:
+                  ageDays: 10
+                device:
+                  ipReputation: RISKY
+      responses:
+        '200':
+          description: Decision evaluated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    BadRequest:
+      description: Invalid request data.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Rule or active rule version not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Unexpected internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    EvaluateDecisionRequest:
+      type: object
+      required:
+        - ruleKey
+      properties:
+        ruleKey:
+          type: string
+          example: fraud-risk-check
+        data:
+          type: object
+          additionalProperties: true
+          description: Dynamic JSON context used during rule evaluation.
+          example:
+            customer:
+              ageDays: 10
+            device:
+              ipReputation: RISKY
+
+    DecisionResponse:
+      type: object
+      properties:
+        result:
+          type: boolean
+          example: true
+        reasons:
+          type: array
+          items:
+            type: string
+          example:
+            - Condition matched: customer.ageDays LESS_THAN 30
+            - Condition matched: device.ipReputation EQUALS RISKY
+        ruleKey:
+          type: string
+          example: fraud-risk-check
+        version:
+          type: integer
+          example: 3
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        evaluatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: Invalid evaluation request.
+        path:
+          type: string
+          example: /decisions/evaluate
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
