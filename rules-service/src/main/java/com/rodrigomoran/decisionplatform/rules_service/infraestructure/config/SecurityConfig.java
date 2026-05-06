@@ -11,11 +11,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/simulation/**","/simulation"
-                        , "/draft/**","/rules/**","/h2-console/**",
-                                "/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+//                        .requestMatchers("/swagger-ui.html",
+//                                "/swagger-ui/**",
+//                                "/v3/api-docs",
+//                                "/v3/api-docs/**"
+//                        ).permitAll()
+                        .anyRequest().permitAll()
                 );
         return http.build();
     }

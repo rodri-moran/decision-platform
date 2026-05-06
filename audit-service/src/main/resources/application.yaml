@@ -19,8 +19,11 @@ spring:
       auto-offset-reset: earliest
 
 springdoc:
+  #  packages-to-scan: com.rodrigomoran.decisionplatform.decision_service.interfaces.rest
+  #  show-actuator: true
   swagger-ui:
     path: /swagger-ui.html
+#    disable-swagger-default-url: true
 
 management:
   endpoints:

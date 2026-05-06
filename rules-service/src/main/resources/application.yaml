@@ -37,6 +37,13 @@ management:
     tracing:
       endpoint: http://localhost:4318/v1/traces
 
+springdoc:
+  #  packages-to-scan: com.rodrigomoran.decisionplatform.decision_service.interfaces.rest
+  #  show-actuator: true
+  swagger-ui:
+    path: /swagger-ui.html
+#    disable-swagger-default-url: true
+
 server:
   port: 8081
 

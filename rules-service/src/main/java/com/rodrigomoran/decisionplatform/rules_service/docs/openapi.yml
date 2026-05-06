@@ -1,0 +1,718 @@
+openapi: 3.0.3
+
+info:
+  title: Rules Service API
+  description: >
+    API for managing rule drafts, publishing immutable rule versions,
+    rolling back active versions and simulating rule definitions.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+    description: Local rules-service
+  - url: http://localhost:8080/rules
+    description: API Gateway route for rules-service
+
+tags:
+  - name: Rule Drafts
+    description: Operations for creating, updating, archiving and querying rule drafts.
+  - name: Rule Versions
+    description: Operations for publishing, rolling back and querying immutable rule versions.
+  - name: Simulation
+    description: Operations for testing rule definitions before publishing.
+
+paths:
+  /draft:
+    post:
+      tags:
+        - Rule Drafts
+      summary: Create a new rule draft
+      description: Creates a draft rule definition that can later be updated, archived or published.
+      operationId: createRuleDraft
+      parameters:
+        - $ref: '#/components/parameters/XActor'
+        - $ref: '#/components/parameters/XTraceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleDraftRequest'
+      responses:
+        '200':
+          description: Draft created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleDraftResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags:
+        - Rule Drafts
+      summary: Get draft by rule key
+      operationId: getDraftByRuleKey
+      parameters:
+        - name: ruleKey
+          in: query
+          required: true
+          schema:
+            type: string
+          example: fraud-risk-check
+      responses:
+        '200':
+          description: Draft found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleDraftResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /draft/{draftId}:
+    patch:
+      tags:
+        - Rule Drafts
+      summary: Update an existing rule draft
+      operationId: updateRuleDraft
+      parameters:
+        - name: draftId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 10
+        - $ref: '#/components/parameters/XActor'
+        - $ref: '#/components/parameters/XTraceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleDraftRequest'
+      responses:
+        '200':
+          description: Draft updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleDraftResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /draft/{draftId}/archive:
+    patch:
+      tags:
+        - Rule Drafts
+      summary: Archive a rule draft
+      operationId: archiveRuleDraft
+      parameters:
+        - name: draftId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 10
+        - $ref: '#/components/parameters/XActor'
+        - $ref: '#/components/parameters/XTraceId'
+      responses:
+        '204':
+          description: Draft archived successfully.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /draft/{id}:
+    get:
+      tags:
+        - Rule Drafts
+      summary: Get draft by ID
+      operationId: getDraftById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 10
+      responses:
+        '200':
+          description: Draft found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleDraftResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /draft/drafts:
+    get:
+      tags:
+        - Rule Drafts
+      summary: List rule drafts
+      operationId: listRuleDrafts
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/RuleDraftStatus'
+          example: DRAFT
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          example: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+          example: 10
+      responses:
+        '200':
+          description: Paginated draft list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRuleDraftResponse'
+
+  /{draftId}/public:
+    post:
+      tags:
+        - Rule Versions
+      summary: Publish a rule draft
+      description: Publishes a draft as a new immutable rule version.
+      operationId: publishDraft
+      parameters:
+        - name: draftId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 10
+        - $ref: '#/components/parameters/XActor'
+        - $ref: '#/components/parameters/XTraceId'
+        - $ref: '#/components/parameters/XIdempotencyKey'
+      responses:
+        '200':
+          description: Draft published successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleVersionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /{ruleKey}/{targetVersionNumber}/rollback:
+    post:
+      tags:
+        - Rule Versions
+      summary: Roll back to a previous rule version
+      operationId: rollbackToVersion
+      parameters:
+        - name: ruleKey
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fraud-risk-check
+        - name: targetVersionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+        - $ref: '#/components/parameters/XActor'
+        - $ref: '#/components/parameters/XTraceId'
+        - $ref: '#/components/parameters/XIdempotencyKey'
+      responses:
+        '200':
+          description: Rollback completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleVersionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /{ruleKey}/active:
+    get:
+      tags:
+        - Rule Versions
+      summary: Get active version by rule key
+      operationId: getActiveVersion
+      parameters:
+        - name: ruleKey
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fraud-risk-check
+      responses:
+        '200':
+          description: Active version found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleVersionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /{ruleKey}/version/{versionNumber}:
+    get:
+      tags:
+        - Rule Versions
+      summary: Get a specific rule version
+      operationId: getVersion
+      parameters:
+        - name: ruleKey
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fraud-risk-check
+        - name: versionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Rule version found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleVersionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /{ruleKey}/versions:
+    get:
+      tags:
+        - Rule Versions
+      summary: List versions for a rule key
+      operationId: listVersions
+      parameters:
+        - name: ruleKey
+          in: path
+          required: true
+          schema:
+            type: string
+          example: fraud-risk-check
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          example: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+          example: 10
+      responses:
+        '200':
+          description: Paginated version list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRuleVersionResponse'
+
+  /simulation:
+    post:
+      tags:
+        - Simulation
+      summary: Simulate a rule definition
+      description: Tests a rule definition before publishing it.
+      operationId: simulateDefinition
+      parameters:
+        - $ref: '#/components/parameters/XTraceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleSimulationRequest'
+      responses:
+        '200':
+          description: Simulation completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleSimulationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  parameters:
+    XActor:
+      name: X-Actor
+      in: header
+      required: true
+      description: User or service that performs the operation.
+      schema:
+        type: string
+      example: admin@decision-platform.com
+
+    XTraceId:
+      name: X-Trace-Id
+      in: header
+      required: true
+      description: Correlation ID used for logs, tracing and events.
+      schema:
+        type: string
+      example: 550e8400-e29b-41d4-a716-446655440000
+
+    XIdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      description: Key used to safely retry publish or rollback operations without duplicating effects.
+      schema:
+        type: string
+      example: publish-draft-10-001
+
+  responses:
+    BadRequest:
+      description: Invalid request data.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Conflict:
+      description: Business conflict, duplicated key or invalid state transition.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    CreateRuleDraftRequest:
+      type: object
+      required:
+        - ruleKey
+        - name
+        - definitionJson
+      properties:
+        ruleKey:
+          type: string
+          example: fraud-risk-check
+        name:
+          type: string
+          example: Fraud risk check
+        description:
+          type: string
+          example: Detects risky fraud patterns before approving an operation.
+        definitionJson:
+          $ref: '#/components/schemas/ParsedRuleDefinition'
+        metadataJson:
+          type: object
+          additionalProperties: true
+          example:
+            category: fraud
+            owner: risk-team
+
+    UpdateRuleDraftRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Updated fraud risk check
+        description:
+          type: string
+          example: Updated rule description.
+        definitionJson:
+          $ref: '#/components/schemas/ParsedRuleDefinition'
+        metadataJson:
+          type: object
+          additionalProperties: true
+          example:
+            category: fraud
+            owner: risk-team
+
+    RuleDraftResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        ruleKey:
+          type: string
+          example: fraud-risk-check
+        name:
+          type: string
+          example: Fraud risk check
+        description:
+          type: string
+          example: Detects risky fraud patterns before approving an operation.
+        definitionJson:
+          $ref: '#/components/schemas/ParsedRuleDefinition'
+        metadataJson:
+          type: object
+          additionalProperties: true
+          example:
+            category: fraud
+            owner: risk-team
+        status:
+          $ref: '#/components/schemas/RuleDraftStatus'
+        createdBy:
+          type: string
+          example: admin@decision-platform.com
+        updatedBy:
+          type: string
+          example: admin@decision-platform.com
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    RuleDraftStatus:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLISHED
+        - ARCHIVED
+      example: DRAFT
+
+    RuleVersionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 30
+        ruleKey:
+          type: string
+          example: fraud-risk-check
+        versionNumber:
+          type: integer
+          example: 1
+        status:
+          $ref: '#/components/schemas/RuleVersionStatus'
+        publishedBy:
+          type: string
+          example: admin@decision-platform.com
+        publishedAt:
+          type: string
+          format: date-time
+        metadataJson:
+          type: string
+          example: '{"category":"fraud","owner":"risk-team"}'
+        reactivatedBy:
+          type: string
+          example: admin@decision-platform.com
+        reactivatedAt:
+          type: string
+          format: date-time
+        changeType:
+          $ref: '#/components/schemas/ChangeType'
+        definitionJson:
+          type: string
+          example: '{"operator":"AND","conditions":[{"field":"customer.ageDays","operator":"LESS_THAN","value":30}]}'
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    RuleVersionStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+      example: ACTIVE
+
+    ChangeType:
+      type: string
+      enum:
+        - PUBLISH
+        - ROLLBACK
+        - REACTIVATE
+      example: PUBLISH
+
+    RuleSimulationRequest:
+      type: object
+      required:
+        - definition
+        - sampleContext
+      properties:
+        definition:
+          $ref: '#/components/schemas/ParsedRuleDefinition'
+        sampleContext:
+          type: object
+          additionalProperties: true
+          example:
+            customer:
+              ageDays: 20
+            device:
+              ipReputation: RISKY
+
+    RuleSimulationResult:
+      type: object
+      properties:
+        matched:
+          type: boolean
+          example: true
+        reasons:
+          type: array
+          items:
+            type: string
+          example:
+            - Condition matched: customer.ageDays LESS_THAN 30
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    PageRuleDraftResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleDraftResponse'
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 25
+        totalPages:
+          type: integer
+          example: 3
+        first:
+          type: boolean
+          example: true
+        last:
+          type: boolean
+          example: false
+
+    PageRuleVersionResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleVersionResponse'
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 5
+        totalPages:
+          type: integer
+          example: 1
+        first:
+          type: boolean
+          example: true
+        last:
+          type: boolean
+          example: true
+
+    ParsedRuleDefinition:
+      type: object
+      required:
+        - operator
+      properties:
+        operator:
+          type: string
+          example: AND
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleCondition'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedRuleDefinition'
+
+    RuleCondition:
+      type: object
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+          example: customer.ageDays
+        operator:
+          type: string
+          example: LESS_THAN
+        value:
+          nullable: true
+          example: 30
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: Invalid rule definition JSON.
+        path:
+          type: string
+          example: /draft
+        traceId:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
